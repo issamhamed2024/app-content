@@ -1,2 +1,2 @@
-const serverUrl = "http://localhost:3000"
+const serverUrl = "https://new-app-content-dcc934885c58.herokuapp.com"
 export { serverUrl }
