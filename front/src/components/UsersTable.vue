@@ -1,6 +1,5 @@
 <template>
   <div>
-    <button @click="handleClick(0)">sss</button>
     <ag-grid-vue
         :columnDefs="columnDefs"
         :rowData="filteredDatas"
