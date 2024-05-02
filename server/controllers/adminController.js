@@ -11,7 +11,7 @@ const Data = require("../models/Data")
 
 exports.saveData = async (req, res) => {
   try {
-    const { name, gender, nationality, city, age, price, mobile, status, notes } = req.body;
+    const { name, gender, nationality, city, age, price, mobile, status, notes, actions } = req.body;
     const image = req.file;
     var savedImage= null;
     if(image) {
@@ -22,7 +22,7 @@ exports.saveData = async (req, res) => {
       await fs.writeFileSync(destinationPath, image.buffer);
       savedImage = path.basename(destinationPath);
     }
-    const newData = new Data({ image: (image ? savedImage: ""), name, gender, nationality, city, age, price, mobile, status, notes})
+    const newData = new Data({ image: (image ? savedImage: ""), name, gender, nationality, city, age, price, mobile, status, notes, actions})
     let status_ = 1;
     let message = "User data saved successfully!";
     try {
@@ -32,6 +32,63 @@ exports.saveData = async (req, res) => {
       message = err;
     }
     res.json({status_, message});
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred", error: error.message });
+  }
+};
+
+exports.updateData = async (req, res) => {
+  try {
+    const { id, name, gender, nationality, city, age, price, mobile, status, notes, actions } = req.body;
+    const image = req.file;
+    const item = await Data.findById(id);
+    var savedImage = item.image;
+    if(image) {
+      const extension = path.extname(image.originalname);
+      const uniqueFilename = `${Date.now()}${extension}`;
+      const destinationPath = path.join(__dirname, '../uploads/images', uniqueFilename);
+      await fs.writeFileSync(destinationPath, image.buffer);
+      savedImage = path.basename(destinationPath);
+    }
+    const newData = { image: savedImage, name, gender, nationality, city, age, price, mobile, status, notes, actions };
+
+    let status_ = 1;
+    let message = "User data saved successfully!";
+    try {
+      await Data.findByIdAndUpdate(id, newData, { new: true });
+    } catch (err) {
+      status_ = 0;
+      message = err;
+    }
+    res.json({status_, message});
+  } catch (error) {
+    res.status(500).json({ message: "An error occurred", error: error.message });
+  }
+};
+
+exports.setDataAttachements = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const files = req.files;
+    const filenames = [];
+    for (const file of files) {
+      const extension = path.extname(file.originalname);
+      const uniqueFilename = `${Date.now()}${extension}`;
+      const destinationPath = path.join(__dirname, '../uploads/images', uniqueFilename);
+      await fs.writeFileSync(destinationPath, file.buffer);
+      filenames.push(uniqueFilename);
+    }
+    const item = await Data.findById(id);
+    const updatedAttachments = [...(item.attachments || '').split(','), ...filenames].join(',');
+    try {
+      const updatedData = await Data.findByIdAndUpdate(id, { $set: { attachments: updatedAttachments } }, { new: true });
+      if (!updatedData) {
+        return res.status(404).json({ status_: 0, message: "Data not found" });
+      }
+      return res.json({ status_: 1, message: "Data status updated successfully", data: updatedAttachments });
+    } catch (error) {
+      return res.status(500).json({ status_: 0, message: "An error occurred", error: error.message });
+    }
   } catch (error) {
     res.status(500).json({ message: "An error occurred", error: error.message });
   }
@@ -56,6 +113,45 @@ exports.setDataStatus = async (req, res) => {
       return res.status(404).json({ status_: 0, message: "Data not found" });
     }
     return res.json({ status_: 1, message: "Data status updated successfully", data: updatedData });
+  } catch (error) {
+    return res.status(500).json({ status_: 0, message: "An error occurred", error: error.message });
+  }
+}
+
+exports.setDataNotes = async (req, res) => {
+  try {
+    const { id, notes } = req.body;
+    const updatedData = await Data.findByIdAndUpdate(id, { notes: notes }, { new: true });
+    if (!updatedData) {
+      return res.status(404).json({ status_: 0, message: "Data not found" });
+    }
+    return res.json({ status_: 1, message: "Data status updated successfully", data: updatedData });
+  } catch (error) {
+    return res.status(500).json({ status_: 0, message: "An error occurred", error: error.message });
+  }
+}
+
+exports.setDataActions = async (req, res) => {
+  try {
+    const { id, actions } = req.body;
+    const updatedData = await Data.findByIdAndUpdate(id, { $set: { actions: actions } }, { new: true });
+    if (!updatedData) {
+      return res.status(404).json({ status_: 0, message: "Data not found" });
+    }
+    return res.json({ status_: 1, message: "Data status updated successfully", data: updatedData });
+  } catch (error) {
+    return res.status(500).json({ status_: 0, message: "An error occurred", error: error.message });
+  }
+}
+
+exports.deleteData = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const deletedUser = await Data.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ status_: 0, message: "Data not found" });
+    }
+    return res.json({ status_: 1, message: "Data status updated successfully", data: deletedUser });
   } catch (error) {
     return res.status(500).json({ status_: 0, message: "An error occurred", error: error.message });
   }

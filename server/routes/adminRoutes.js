@@ -22,7 +22,20 @@ router.post(
     upload.single("imageData"),
     adminController.saveData
 )
+router.post(
+    "/updateData",
+    upload.single("imageData"),
+    adminController.updateData
+)
+router.post(
+    "/setDataAttachements",
+    upload.array("files"),
+    adminController.setDataAttachements
+)
 router.get("/getData", adminController.getData)
 router.post("/setDataStatus", adminController.setDataStatus)
+router.post("/setDataNotes", adminController.setDataNotes)
+router.post("/setDataActions", adminController.setDataActions)
+router.post("/deleteData", adminController.deleteData)
 
 module.exports = router

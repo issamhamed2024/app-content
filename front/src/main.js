@@ -8,7 +8,11 @@ createApp(App).mount("#app")
 import router from "./router.js"
 const app = createApp(App)
 app.use(router)
-
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal-backdrop')) {
+        event.target.remove();
+    }
+});
 app.use(Notifications)
 //app.use(store)
 app.mount("#app")

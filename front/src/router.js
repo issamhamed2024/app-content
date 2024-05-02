@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router"
-import FormView from "./views/FormView.vue"
 import AdminPanel from "./views/AdminPanel.vue"
 import LoginView from "./views/LoginView.vue"
 
 const routes = [
   {
     path: "/",
-    name: "Form",
-    component: FormView,
+    name: "Home",
+    component: AdminPanel,
+    meta: { requiresAuth: true },
   },
   {
     path: "/admin",

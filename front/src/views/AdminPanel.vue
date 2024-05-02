@@ -14,13 +14,12 @@
       </div>
       <div class="col-sm-8"></div>
       <div class="col-sm-2">
-        <button class="btn btn-warning" href="#" data-toggle="modal" data-target="#exampleModal" data-bs-toggle="modal" data-bs-target="#exampleModal">جديد</button>
+        <button class="btn btn-warning" href="#" data-toggle="modal" data-target="#exampleModal" id="exampleModalBtn" data-bs-toggle="modal" data-bs-target="#exampleModal">جديد</button>
       </div>
     </div>
     <div class="row pb-5">
-      {{searchText}}
-      <NewModal @reload="reloadData"/>
-      <UsersTable :searchText="searchText" ref="UsersTableRef"/> 
+      <NewModal :current_data="current_data" @reload="reloadData"/>
+      <UsersTable @send_current_data="send_current_data" :searchText="searchText" ref="UsersTableRef"/> 
     </div>
   </div>
   
@@ -62,6 +61,12 @@ export default {
   data() {
     return {
       searchText: '',
+      current_data: {},
+      
+      
+      
+      
+      
       
       
       
@@ -151,6 +156,9 @@ export default {
     reloadData() {
       this.$refs.UsersTableRef.getData();
     },
+    send_current_data(value) {
+      this.current_data = value
+    },
     
     
     
@@ -200,12 +208,11 @@ export default {
 
     async exportCSV() {
       try {
-        const response = await axios.get(
+        await axios.get(
           `${serverUrl}/api/admin/export-csv` // Changez l'URL de l'endpoint pour uploader vers S3
         )
-        console.log("response", response.data)
       } catch (err) {
-        console.log(err.message)
+        console.error(err.message)
       }
     },
     renderSendButton(params) {
@@ -233,7 +240,7 @@ export default {
         this.loading = false
       } catch (error) {
         this.loading = false
-        console.log("errer", error.message)
+        console.erro("errer", error.message)
       }
     },
     filterByImage(hasImage) {

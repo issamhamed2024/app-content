@@ -12,7 +12,9 @@ const dataSchema = new Schema({
     mobile: {type: String, required: true},
     status: {type: Number, required: true},
     notes: {type: String, required: false},
+    actions: {type: String, required: false},
     creationDate: {type: Date, default: Date.now},
+    attachments: {type: String, required: false},
 })
 
 module.exports = mongoose.model("Data", dataSchema)

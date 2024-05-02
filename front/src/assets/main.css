@@ -125,3 +125,35 @@ body * {
 .cursor-pointer {
     cursor: pointer !important;
 }
+
+#attachementsModal .modal-content {
+    background: #F4F9FD;
+}
+
+.an-attachement {
+    background: #fff;
+    display: block;
+    width: 100%;
+    padding: 12px;
+    padding-right: 20px;
+    margin-top: 20px;
+    border: 1px solid #ededed;
+    color: #222;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.2s ease-in;
+}
+
+.an-attachement:after {
+    content: "";
+    width: 4px;
+    height: 100%;
+    background: #ededed;
+    display: block;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+.an-attachement:hover {
+    background: #f3f3f3;
+}

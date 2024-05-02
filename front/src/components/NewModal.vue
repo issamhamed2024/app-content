@@ -1,9 +1,10 @@
 <template>
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <form class="modal-content" @submit.prevent="handleSubmit">
+      <form class="modal-content" @submit.prevent="handleSubmit" id="exampleModalLabelForm">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">إضافة جديد</h5>
+          <h5 v-if="current_data" class="modal-title" id="exampleModalLabel">تعديل</h5>
+          <h5 v-else class="modal-title" id="exampleModalLabel">إضافة جديد</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -62,10 +63,6 @@
                 <input type="text" v-model="formData.mobile" class="form-control" required>
               </div>
             </div>
-            <div class="col-sm-6 mb-3">
-                <label class="form-label">الأعمال</label>
-                <input type="file" accept="image/*"  class="form-control">
-            </div>
             <div class="col-sm-6">
               <div class="mb-3">
                 <label class="form-label">الحالة <span class="text-danger">*</span></label>
@@ -74,6 +71,15 @@
                   <option value="0">غير فعال</option>
                 </select>
               </div>
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label class="form-label">الإجراءات </label>
+              <select v-model="formData.actions" id="" class="form-control" multiple>
+                <option value="1">تم التعامل سابقا</option>
+                <option value="2">لم يتم التعامل</option>
+                <option value="3">ممتاز</option>
+                <option value="4">غير ممتاز</option>
+              </select>
             </div>
             <div class="col-sm-12">
               <div class="mb-3">
@@ -99,10 +105,10 @@ import {serverUrl} from "@/const";
 
 export default {
   name: "NewModal",
+  props: ['current_data'],
   data() {
     return {
       image: null,
-      attachements: null,
       formData: {
         name: '',
         gender: 'male',
@@ -112,10 +118,31 @@ export default {
         price: '',
         mobile: '',
         status: 1,
-        notes: ''
+        notes: '',
+        actions: "",
+        id: null
       }
     };
-  }, 
+  },
+  watch: {
+    current_data(newValue) {
+      this.formData.id = newValue ? newValue.idd : '';
+      this.formData.name = newValue ? newValue.name : '';
+      this.formData.gender = newValue ? (newValue.gender == 'ذكر' ? 'male' : 'female') : 'ذكر';
+      this.formData.nationality = newValue ? newValue.nationality : '';
+      this.formData.city = newValue ? newValue.city : '';
+      this.formData.age = newValue ? newValue.age : '';
+      this.formData.price = newValue ? newValue.price : '';
+      this.formData.mobile = newValue ? newValue.mobile : '';
+      this.formData.status = newValue ? newValue.status : '';
+      this.formData.notes = newValue ? newValue.notes : '';
+      if (typeof newValue.actions === 'string' && newValue.actions.trim() !== '') {
+        this.formData.actions = newValue.actions.split(',');
+      } else {
+        this.formData.actions = [];
+      }
+    }
+  },
   methods: {
     handleImage(event) {
       this.image = event.target.files[0]
@@ -124,6 +151,7 @@ export default {
       document.querySelector('.saveUserbtn').disabled = true;
       document.querySelector('.closeModalbtn').disabled = true;
 
+      let url = `${serverUrl}/api/admin/saveData`
       const formData = new FormData();
       formData.append("imageData", this.image)
       formData.append("name", this.formData.name)
@@ -135,10 +163,14 @@ export default {
       formData.append("mobile", this.formData.mobile)
       formData.append("status", this.formData.status)
       formData.append("notes", this.formData.notes)
-      
+      formData.append("actions", this.formData.actions)
+      if(this.current_data) {
+        formData.append("id", this.formData.id)
+        url = `${serverUrl}/api/admin/updateData`
+      }
       try {
         const response = await axios.post(
-            `${serverUrl}/api/admin/saveData`,
+            url,
             formData,
             {
               headers: {
@@ -147,15 +179,29 @@ export default {
             }
         )
         if(response.data.status_ == 1) {
+          const form = document.getElementById('exampleModalLabelForm');
+          form.reset();
           this.$notify({ type: "success", text: "تم الحفظ بنجاح"})
           this.$emit('reload',);
+          this.formData.id = null;
+          this.formData.name = '';
+          this.formData.gender = 'male';
+          this.formData.nationality = '';
+          this.formData.city = '';
+          this.formData.age = 30;
+          this.formData.price = '';
+          this.formData.mobile = '';
+          this.formData.status = 1;
+          this.formData.notes = '';
+          this.formData.actions = '';
+          this.image = null;
         }
         else {
           console.log(response.data.message)
-          this.$notify({ type: "error", text: "لقد وقع خطأ ما, الرجاء المحاولة من جديد "})
+          this.$notify({ type: "error", text: "لقد وقع خyttyطأ ما, الرجاء المحاولة من جديد "})
         }
       } catch (error) {
-        this.$notify({ type: "error", text: "لقد وقع خطأ ما, الرجاء المحاولة من جديد "})
+        this.$notify({ type: "error", text: "لقد وقع rrrrrrrrrrrrخطأ ما, الرجاء المحاولة من جديد "})
         console.error("Error uploading file:", error);
       } finally {
         document.querySelector('.saveUserbtn').disabled = false;

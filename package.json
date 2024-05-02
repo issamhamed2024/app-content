@@ -12,6 +12,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.2",
     "multer": "^1.4.5-lts.1",
+    "primevue": "^3.52.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
