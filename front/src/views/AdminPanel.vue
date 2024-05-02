@@ -14,7 +14,8 @@
       </div>
       <div class="col-sm-8"></div>
       <div class="col-sm-2">
-        <button class="btn btn-warning" href="#" data-toggle="modal" data-target="#exampleModal" id="exampleModalBtn" data-bs-toggle="modal" data-bs-target="#exampleModal">جديد</button>
+        <button class="btn btn-warning" href="#" @click="handleButtonClick" id="exampleModalBtn">جديد</button>
+        <button class="btn btn-warning d-none" href="#" @click="handleButtonClick2" id="exampleModalBtn2">جديد</button>
       </div>
     </div>
     <div class="row pb-5">
@@ -50,6 +51,8 @@ import SearchForm from "@/components/SearchForm.vue";
 import UserToggle from "@/components/UserToggle.vue";
 import UsersTable from "@/components/UsersTable.vue";
 import NewModal from "@/components/NewModal.vue";
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle'
+
 export default {
   components: {
     NewModal,
@@ -61,7 +64,7 @@ export default {
   data() {
     return {
       searchText: '',
-      current_data: {},
+      current_data: null,
       
       
       
@@ -159,7 +162,17 @@ export default {
     send_current_data(value) {
       this.current_data = value
     },
-    
+    handleButtonClick() {
+      const modalElement = document.getElementById('exampleModal');
+      const modal = new bootstrap.Modal(modalElement);
+      this.current_data = null
+      modal.show();
+    },
+    handleButtonClick2() {
+      const modalElement = document.getElementById('exampleModal');
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    },
     
     
     
@@ -363,7 +376,7 @@ export default {
       backdrop.parentNode.removeChild(backdrop);
     }
     this.fetchRequests()
-    this.filteredImage = null // Initialiser filteredImage à null
+    this.filteredImage = null
     this.filteredSendDate = null
   },
 }

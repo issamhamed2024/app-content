@@ -437,7 +437,9 @@ export default {
           const response = await axios.post(`${serverUrl}/api/admin/deleteData`, {id})
           if(response.data.status_ == 1){
             this.$notify({ type: "success", text: "تم الحذف بتجاح"})
-            document.querySelector('.closeModalbtnActions').click();
+            const z = document.querySelector('.closeModalbtnActions')
+            if(z)
+              z.click();
             this.getData()
           }
           else {
@@ -451,12 +453,14 @@ export default {
       }
     },
     editUser() {
-      this.current_data
-      console.log(this.current_data)
       this.$emit('send_current_data', this.current_data);
-      document.querySelector('.closeModalbtnActions').click();
+      const x = document.querySelector('.closeModalbtnActions')
+      if(x)
+          x.click();
       setTimeout(function () {
-        document.querySelector("#exampleModalBtn").click()
+        const y = document.querySelector("#exampleModalBtn2")
+        if(y)
+          y.click();
       }, 1000)
     },
     async getData() {

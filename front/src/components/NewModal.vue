@@ -126,20 +126,22 @@ export default {
   },
   watch: {
     current_data(newValue) {
-      this.formData.id = newValue ? newValue.idd : '';
-      this.formData.name = newValue ? newValue.name : '';
-      this.formData.gender = newValue ? (newValue.gender == 'ذكر' ? 'male' : 'female') : 'ذكر';
-      this.formData.nationality = newValue ? newValue.nationality : '';
-      this.formData.city = newValue ? newValue.city : '';
-      this.formData.age = newValue ? newValue.age : '';
-      this.formData.price = newValue ? newValue.price : '';
-      this.formData.mobile = newValue ? newValue.mobile : '';
-      this.formData.status = newValue ? newValue.status : '';
-      this.formData.notes = newValue ? newValue.notes : '';
-      if (typeof newValue.actions === 'string' && newValue.actions.trim() !== '') {
-        this.formData.actions = newValue.actions.split(',');
-      } else {
-        this.formData.actions = [];
+      if(newValue) {
+        this.formData.id = newValue ? newValue.idd : '';
+        this.formData.name = newValue ? newValue.name : '';
+        this.formData.gender = newValue ? (newValue.gender == 'ذكر' ? 'male' : 'female') : 'ذكر';
+        this.formData.nationality = newValue ? newValue.nationality : '';
+        this.formData.city = newValue ? newValue.city : '';
+        this.formData.age = newValue ? newValue.age : '';
+        this.formData.price = newValue ? newValue.price : '';
+        this.formData.mobile = newValue ? newValue.mobile : '';
+        this.formData.status = newValue ? newValue.status : '';
+        this.formData.notes = newValue ? newValue.notes : '';
+        if (typeof newValue?.actions === 'string' && newValue?.actions.trim() !== '') {
+          this.formData.actions = newValue.actions.split(',');
+        } else {
+          this.formData.actions = [];
+        }
       }
     }
   },
@@ -164,7 +166,7 @@ export default {
       formData.append("status", this.formData.status)
       formData.append("notes", this.formData.notes)
       formData.append("actions", this.formData.actions)
-      if(this.current_data) {
+      if(this.current_data?.id) {
         formData.append("id", this.formData.id)
         url = `${serverUrl}/api/admin/updateData`
       }
@@ -201,7 +203,7 @@ export default {
           this.$notify({ type: "error", text: "لقد وقع خyttyطأ ما, الرجاء المحاولة من جديد "})
         }
       } catch (error) {
-        this.$notify({ type: "error", text: "لقد وقع rrrrrrrrrrrrخطأ ما, الرجاء المحاولة من جديد "})
+        this.$notify({ type: "error", text: "لقد وقع خطأ ما, الرجاء المحاولة من جديد "})
         console.error("Error uploading file:", error);
       } finally {
         document.querySelector('.saveUserbtn').disabled = false;
