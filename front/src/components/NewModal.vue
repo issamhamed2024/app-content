@@ -200,7 +200,7 @@ export default {
         }
         else {
           console.log(response.data.message)
-          this.$notify({ type: "error", text: "لقد وقع خyttyطأ ما, الرجاء المحاولة من جديد "})
+          this.$notify({ type: "error", text: "لقد وقع خطأ ما, الرجاء المحاولة من جديد "})
         }
       } catch (error) {
         this.$notify({ type: "error", text: "لقد وقع خطأ ما, الرجاء المحاولة من جديد "})

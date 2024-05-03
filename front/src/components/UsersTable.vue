@@ -90,14 +90,31 @@
             <div class="row">
               <div class="col-sm-12">
                 <div class="mb-3">
-                  <input type="file" @change="handleFiles" multiple required 
-                         accept="image/*,.pdf,.txt,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,video/*" class="form-control">
-                  <div class="row">
-                    <div class="col-sm-4" v-for="(item, index) in current_attachements" :key="index">
-                      <a :href="`${serverUrl}/uploads/images/${item}`" target="_blank" class="an-attachement"><strong>{{item}}</strong></a>
-                    </div>
-                  </div>
+                  <label for="attachment_name" class="form-label">إسم العمل</label>
+                  <input type="text" class="form-control mb-3" v-model="attachements_name" required placeholder="إسم العمل" id="attachment_name">
                 </div>
+                <div class="mb-3">
+                  <label for="attachment_files" class="form-label">المرفقات</label>
+                  <input type="file" @change="handleFiles" multiple required id="attachment_files"
+                         accept="image/*,.pdf,.txt,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,video/*" class="form-control">
+                </div>
+              </div>
+              <div class="col-sm-6" v-for="(item, index) in current_attachements" :key="index">
+                <a :href="item.split(';')[0]" target="_blank" class="an-attachement">
+                  <strong>{{ item.split(';')[1] }}</strong>
+                  <div v-if="isImageUrl(item.split(';')[0])">
+                    <img :src="item.split(';')[0]" alt="">
+                  </div>
+                  <div v-if="isPdfUrl(item.split(';')[0])">
+                    <i class="fas fa-file-pdf text-danger"></i>
+                  </div>
+                  <div v-if="isWordOrTxtUrl(item.split(';')[0])">
+                    <i class="fas fa-file-word text-primary"></i>
+                  </div>
+                  <div v-if="isVideoUrl(item.split(';')[0])">
+                    <i class="fas fa-video text-success"></i>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
@@ -144,6 +161,7 @@ export default {
       current_data: null,
       current_notes: "",
       current_attachements: "",
+      attachements_name: new Date().toISOString().replace("T", " ").slice(0, 19),
       datas: [],
       columnDefs: [
         { field: "id", headerName: "#", width: 50, cellClass: "text-center" },
@@ -170,7 +188,7 @@ export default {
     filteredDatas(){
       let arr = [];
       this.datas.map((data, i) => {
-        const imageURL = (data.image && data.image !="" ) ? `${serverUrl}/uploads/images/${data.image}` : `${serverUrl}/uploads/no-image.jpg`; 
+        const imageURL = (data.image && data.image !="" ) ? data.image : `${serverUrl}/uploads/no-image.jpg`; 
         const item = { id: i + 1, 
           image: imageURL, 
           name: data.name, 
@@ -233,7 +251,6 @@ export default {
       element.addEventListener("click", () => this.updateAttachements(data))
     },
     updateAttachements(data) {
-      console.log(data)
       this.current_id = data.idd
       let current_attachements = data.attachments || ""
       this.current_attachements = current_attachements.split(",").filter(item => item)
@@ -259,6 +276,7 @@ export default {
           formData.append("files", file);
         }
         formData.append("id", id)
+        formData.append("name", this.attachements_name)
         const response = await axios.post(
             `${serverUrl}/api/admin/setDataAttachements`,
             formData,
@@ -287,6 +305,7 @@ export default {
       } finally {
         document.querySelector('.saveUserbtnAttachements').disabled = false;
         document.querySelector('.closeModalbtnAttachements').disabled = false;
+        this.attachements_name = new Date().toISOString().replace("T", " ").slice(0, 19)
       }
     },
     renderSendButton(params) {
@@ -478,6 +497,22 @@ export default {
         this.$notify({ type: "error", text: "لقد وقع خطأ ما, الرجاء المحاولة من جديد "})
         console.error("Error uploading file:", error);
       }
+    },
+    isImageUrl(url) {
+      return [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg"].some(ext => url.toLowerCase().endsWith(ext));
+    },
+    isPdfUrl(url) {
+      return url.toLowerCase().endsWith(".pdf");
+    },
+    isWordOrTxtUrl(url) {
+      const lowerUrl = url.toLowerCase();
+      return lowerUrl.endsWith(".doc") || lowerUrl.endsWith(".docx") || lowerUrl.endsWith(".txt") || 
+          lowerUrl.endsWith(".document") || lowerUrl.endsWith(".plain");
+    },
+    isVideoUrl(url) {
+      const lowerUrl = url.toLowerCase();
+      const videoExtensions = [".mp4", ".avi", ".mkv", ".mov", ".flv", ".wmv", ".webm"];
+      return videoExtensions.some(ext => lowerUrl.endsWith(ext));
     },
     reloadData() {
       this.getData();

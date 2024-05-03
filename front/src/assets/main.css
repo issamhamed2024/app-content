@@ -29,19 +29,27 @@ body * {
     color: #90929A;
 }
 
-#user-dropdwon .dropdown-toggle{
+#user-dropdwon .btn{
     background: #ffffff;
     width: 260px;
     padding: 10px;
     float: left;
 }
 
-#user-dropdwon .dropdown-toggle::after{
+#user-dropdwon .btn::after{
     float: left;
     margin-top: 12px;
+    display: inline-block;
+    margin-left: .255em;
+    vertical-align: .255em;
+    content: "";
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
 }
 
-#user-dropdwon .dropdown-toggle:active, #user-dropdwon .dropdown-toggle.show {
+#user-dropdwon .btn:active, #user-dropdwon .btn.show {
     border: none;
 }
 
@@ -56,6 +64,8 @@ body * {
 #user-dropdwon .dropdown-menu {
     width: 200px;
     border: 1px solid #ebebeb;
+    top: 48px;
+    right: 41px;
 }
 
 .btn-warning {
@@ -142,6 +152,7 @@ body * {
     text-decoration: none;
     position: relative;
     transition: all 0.2s ease-in;
+    position: relative;
 }
 
 .an-attachement:after {
@@ -154,6 +165,29 @@ body * {
     top: 0px;
     right: 0px;
 }
+
 .an-attachement:hover {
     background: #f3f3f3;
 }
+
+.an-attachement div {
+    position:absolute;
+    width: 49px;
+    height: 49px;
+    top: 0px;
+    left: 0px;
+    border: 1px solid #eeeeee;
+    border-right: none;
+    text-align: center;
+}
+
+.an-attachement div img{
+    width: 100%;
+    height: 100%;
+}
+
+.an-attachement div i{
+    line-height: 49px;
+    font-size: 26px;
+}
+

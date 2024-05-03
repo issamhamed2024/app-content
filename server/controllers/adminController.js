@@ -14,14 +14,8 @@ exports.saveData = async (req, res) => {
     const { name, gender, nationality, city, age, price, mobile, status, notes, actions } = req.body;
     const image = req.file;
     var savedImage= null;
-    if(image) {
-      const extension = path.extname(image.originalname);
-      const uniqueFilename = `${Date.now()}${extension}`;
-      const destinationPath = path.join(__dirname, '../uploads/images', uniqueFilename);
-      fs.writeFileSync(destinationPath, image.buffer);
-      await fs.writeFileSync(destinationPath, image.buffer);
-      savedImage = path.basename(destinationPath);
-    }
+    if(image) 
+      savedImage = await uploadPhoto(image);
     const newData = new Data({ image: (image ? savedImage: ""), name, gender, nationality, city, age, price, mobile, status, notes, actions})
     let status_ = 1;
     let message = "User data saved successfully!";
@@ -43,13 +37,8 @@ exports.updateData = async (req, res) => {
     const image = req.file;
     const item = await Data.findById(id);
     var savedImage = item.image;
-    if(image) {
-      const extension = path.extname(image.originalname);
-      const uniqueFilename = `${Date.now()}${extension}`;
-      const destinationPath = path.join(__dirname, '../uploads/images', uniqueFilename);
-      await fs.writeFileSync(destinationPath, image.buffer);
-      savedImage = path.basename(destinationPath);
-    }
+    if(image)
+      savedImage = await uploadPhoto(image);
     const newData = { image: savedImage, name, gender, nationality, city, age, price, mobile, status, notes, actions };
 
     let status_ = 1;
@@ -68,15 +57,13 @@ exports.updateData = async (req, res) => {
 
 exports.setDataAttachements = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, name } = req.body;
     const files = req.files;
     const filenames = [];
     for (const file of files) {
-      const extension = path.extname(file.originalname);
-      const uniqueFilename = `${Date.now()}${extension}`;
-      const destinationPath = path.join(__dirname, '../uploads/images', uniqueFilename);
-      await fs.writeFileSync(destinationPath, file.buffer);
-      filenames.push(uniqueFilename);
+      let savedImage = await uploadPhoto(file);
+      savedImage = savedImage + ";" + name;
+      filenames.push(savedImage);
     }
     const item = await Data.findById(id);
     const updatedAttachments = [...(item.attachments || '').split(','), ...filenames].join(',');
@@ -157,55 +144,6 @@ exports.deleteData = async (req, res) => {
   }
 }
 
-// Configurez l'accès à S3 avec vos clés d'accès
-
-exports.uploadPhoto = async (req, res) => {
-  AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION, // Remplacez par la région où se trouve votre compartiment S3
-  })
-  try {
-    const file = req.file // Récupérer le fichier à partir du champ 'imageData'
-    if (!req.file) {
-      return res.status(400).json({ message: "Aucun fichier téléchargé" })
-    }
-
-    const orderId = req.body.orderId
-    // Générer un nom de fichier unique
-    const timestamp = Date.now() // Timestamp actuel
-    const randomString = Math.random().toString(36).substring(2, 15) // Chaîne aléatoire
-    const fileType = file.mimetype.split("/")[1]
-    const fileName = `photo_${timestamp}_${randomString}.${fileType}`
-    // Utiliser le nom de fichier généré dans les paramètres S3
-    const s3 = new AWS.S3()
-    const s3Params = {
-      Bucket: "maabada",
-      Key: `users_files/${fileName}`, // Utilisation du nom de fichier généré
-      Body: file.buffer, // Les données binaires du fichier à téléverser
-      ContentType: fileType,
-      ACL: "public-read",
-    }
-    // Téléverser le fichier vers S3
-    await s3.upload(s3Params).promise()
-
-    // Construisez l'URL de l'image à partir de l'URI S3
-    const imageUrl = `https://maabada.s3.eu-north-1.amazonaws.com/users_files/${fileName}`
-
-    // Mettre à jour l'ordre avec l'URL de l'image
-    await Order.findByIdAndUpdate(orderId, { urlPicture: imageUrl })
-
-    res.status(200).json({ imageUrl })
-  } catch (error) {
-    console.error(
-      "Erreur lors de l'enregistrement de la photo :",
-      error.message
-    )
-    res.status(500).json({
-      message: `Une erreur est survenue lors de l'enregistrement de la photo. ${error.message}`,
-    })
-  }
-}
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body
@@ -213,16 +151,16 @@ exports.login = async (req, res) => {
 
     if (!user) {
       return res
-        .status(401)
-        .json({ message: "Authentication failed. User not found." })
+          .status(401)
+          .json({ message: "Authentication failed. User not found." })
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (!isPasswordValid) {
       return res
-        .status(401)
-        .json({ message: "Authentication failed. Wrong password." })
+          .status(401)
+          .json({ message: "Authentication failed. Wrong password." })
     }
 
     const token = jwt.sign({ userId: user._id }, "secret_key", {
@@ -234,6 +172,39 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
+
+const uploadPhoto = async (file) => {
+  AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION, // Remplacez par la région où se trouve votre compartiment S3
+  })
+  try {
+    // Générer un nom de fichier unique
+    const timestamp = Date.now() // Timestamp actuel
+    const randomString = Math.random().toString(36).substring(2, 15) // Chaîne aléatoire
+    const fileType = file.mimetype.split("/")[1]
+    const fileName = `file_${timestamp}_${randomString}.${fileType}`
+    // Utiliser le nom de fichier généré dans les paramètres S3
+    const s3 = new AWS.S3()
+    const s3Params = {
+      Bucket: "maabada",
+      Key: `users_files/${fileName}`, // Utilisation du nom de fichier généré
+      Body: file.buffer, // Les données binaires du fichier à téléverser
+      ContentType: fileType,
+      ACL: "public-read",
+    }
+    // Téléverser le fichier vers S3
+    await s3.upload(s3Params).promise()
+    // Construisez l'URL de l'image à partir de l'URI S3
+    const imageUrl = `https://maabada.s3.eu-north-1.amazonaws.com/users_files/${fileName}`
+    return imageUrl;
+  } catch (error) {
+    return  error.message
+  }
+}
+
+// Configurez l'accès à S3 avec vos clés d'accès
 
 // Méthode pour récupérer toutes les demandes
 exports.getOrder = async (req, res) => {

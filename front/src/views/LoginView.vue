@@ -1,14 +1,28 @@
 <template>
-  <div class="login-container">
-    <h1>تسجيل الدخول</h1>
-    <form @submit.prevent="login" class="login-form">
-      <label>اسم المستخدم:</label>
-      <input type="text" v-model="username" required />
-      <label>كلمة المرور:</label>
-      <input type="password" v-model="password" required />
-      <button type="submit">تسجيل الدخول</button>
-      <span v-if="loginError" class="error">{{ loginError }}</span>
-    </form>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title text-center m-0">تسجيل الدخول</h4>
+          </div>
+          <div class="card-body">
+            <form @submit.prevent="login">
+              <div class="mb-3">
+                <label for="username" class="form-label fw-bold">اسم المستخدم:</label>
+                <input v-model="username" type="text" class="form-control" id="username" required />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label fw-bold">كلمة المرور:</label>
+                <input v-model="password" type="password" class="form-control" id="password" required />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">تسجيل الدخول</button>
+              <span v-if="loginError" class="error mt-3 fw-bold">{{ loginError }}</span>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -26,13 +40,10 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post(`${serverUrl}/api/admin/login`, {
+        await axios.post(`${serverUrl}/api/admin/login`, {
           username: this.username,
           password: this.password,
         })
-        console.log("response", response)
-        // Authentification réussie
-        // Stocker l'état de l'authentification dans localStorage
         localStorage.setItem("isAuthenticated", true)
         // Rediriger l'utilisateur vers la page d'administration
         this.$router.push({ name: "Admin" })
