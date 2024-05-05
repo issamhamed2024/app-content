@@ -123,7 +123,7 @@
                 </div>
                 <div v-if="isVideoUrl(item.split(';')[0])">
                   <video controls style="width:100%">
-                    <source :src="isVideoUrl(item.split(';')[0])" >
+                    <source :src="item.split(';')[0]" >
                     Your browser does not support the video tag.
                   </video>
                 </div>
