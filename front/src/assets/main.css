@@ -205,4 +205,8 @@ body * {
      -moz-user-select: text;
      -ms-user-select: text;
      -webkit-user-select: text;
- }
+}
+
+.videoContainer video {
+    width: 100% !important;
+}

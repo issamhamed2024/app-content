@@ -121,12 +121,7 @@
                 <div v-if="isImageUrl(item.split(';')[0])">
                   <img :src="item.split(';')[0]" alt="" style="width:100%">
                 </div>
-                <div v-if="isVideoUrl(item.split(';')[0])">
-                  <video controls style="width:100%">
-                    <source :src="item.split(';')[0]" >
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
+                <div class="videoContainer" v-if="isVideoUrl(item.split(';')[0])" :data-url="item.split(';')[0]"></div>
               </div>
             </div>
           </div>
@@ -276,6 +271,28 @@ export default {
       if (modal) {
         const modalInstance = new bootstrap.Modal(modal);
         modalInstance.show();
+        setTimeout(function () {
+          const containers = document.querySelectorAll('.videoContainer');
+          containers.forEach(container => {
+            console.log(container)
+            // Remove any existing video elements
+            const existingVideo = container.querySelector('video');
+            if (existingVideo) {
+              container.removeChild(existingVideo);
+            }
+            // Create a new video element
+            const player = document.createElement('video');
+            player.className = 'videoPlayer'; // Add class for specific styling
+            player.controls = true;
+            player.width = '100%'; // Set width to 100% if needed
+            // Set source from data-url attribute of the container
+            const url = container.getAttribute('data-url');
+            player.src = url;
+            // Append the new video player to the container
+            container.appendChild(player);
+            player.load(); // Load the new video
+          });
+        }, 10);
       }
     },
     handleFiles(event) {
