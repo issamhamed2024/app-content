@@ -103,6 +103,7 @@
               </div>
               <div class="col-sm-6" v-for="(item, index) in current_attachements" :key="index">
                 <a :href="item.split(';')[0]" target="_blank" class="an-attachement">
+                  <i class="fas fa-external-link-alt" style="margin-left: 10px;"></i>
                   <strong>{{ item.split(';')[1] }}</strong>
                   <div v-if="isImageUrl(item.split(';')[0])">
                     <img :src="item.split(';')[0]" alt="">
@@ -117,6 +118,15 @@
                     <i class="fas fa-video text-success"></i>
                   </div>
                 </a>
+                <div v-if="isImageUrl(item.split(';')[0])">
+                  <img :src="item.split(';')[0]" alt="" style="width:100%">
+                </div>
+                <div v-if="isVideoUrl(item.split(';')[0])">
+                  <video controls style="width:100%">
+                    <source :src="isVideoUrl(item.split(';')[0])" >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
               </div>
             </div>
           </div>
