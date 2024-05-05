@@ -113,10 +113,6 @@ body * {
     border: none !important;
 }
 
-.ag-row-position-absolute {
-    top: 20px;
-}
-
 .ag-header, .ag-row, .ag-paging-panel {
     background: #ffffff;
     border: none !important;
@@ -191,3 +187,22 @@ body * {
     font-size: 26px;
 }
 
+.ag-center-cols-viewport {
+    background: #ffffff;
+}
+
+.ag-header-viewport, .ag-paging-panel {
+    background: #eeeeee;
+}
+
+.ag-row-position-absolute {
+    border-top: 5px solid #F4F9FD !important;
+    border-bottom: 5px solid #F4F9FD !important;
+}
+
+.selectable-text {
+     user-select: text;
+     -moz-user-select: text;
+     -ms-user-select: text;
+     -webkit-user-select: text;
+ }

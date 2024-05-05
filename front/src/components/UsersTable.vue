@@ -13,6 +13,8 @@
         :pagination="true"
         :getRowStyle="getRowStyle"
         @model-updated="onModelUpdated"
+        :paginationPageSize="50"
+        :gridOptions="{localeText: arabicLocale}"
     >
     </ag-grid-vue>
     <div class="modal fade" id="NotesModal" ref="notesModal" tabindex="-1"  aria-hidden="true">
@@ -138,7 +140,6 @@ import {serverUrl} from "@/const"
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle'
 import NewModal from "@/components/NewModal.vue";
 
-
 export default {
   name: "UsersTable",
   components: {
@@ -164,15 +165,15 @@ export default {
       attachements_name: new Date().toISOString().replace("T", " ").slice(0, 19),
       datas: [],
       columnDefs: [
-        { field: "id", headerName: "#", width: 50, cellClass: "text-center" },
+        { field: "id", headerName: "#", width: 60, cellClass: "text-center selectable-text" },
         { field: "image", headerName: "الصورة", width: 100, cellRenderer: this.renderImageCell },
-        { field: "name", headerName: "الإسم" },
-        { field: "gender", headerName: "الجنس", width: 140 },
-        { field: "nationality", headerName: "الجنسية", width: 140 },
-        { field: "city", headerName: "المدينة" },
-        { field: "age", headerName: "العمر", width: 140 },
-        { field: "price", headerName: "التكلفة", cellRenderer: this.renderPriceCell },
-        { field: "mobile", headerName: "الجوال" },
+        { field: "name", headerName: "الإسم", cellClass: 'selectable-text' },
+        { field: "gender", headerName: "الجنس", width: 140, cellClass: 'selectable-text'  },
+        { field: "nationality", headerName: "الجنسية", width: 140, cellClass: 'selectable-text'  },
+        { field: "city", headerName: "المدينة", cellClass: 'selectable-text'  },
+        { field: "age", headerName: "العمر", width: 140, cellClass: 'selectable-text'  },
+        { field: "price", headerName: "التكلفة", cellRenderer: this.renderPriceCell, cellClass: 'selectable-text'  },
+        { field: "mobile", headerName: "الجوال", cellClass: 'selectable-text'  },
         { field: "attachements", headerName: "الأعمال", width: 140, cellClass: "text-center", cellRenderer: this.renderAttachementsCell  },
         { field: "status", headerName: "الحالة", width: 140, cellClass: "text-center", cellRenderer: this.renderSendButton, },
         { field: "notes", headerName: "ملاحظات", width: 140, cellClass: "text-center", cellRenderer: this.renderNotesCell  },
@@ -182,6 +183,13 @@ export default {
         resizable: true,
         sortable: true,
       },
+      arabicLocale: {
+        pageSizeSelectorLabel: 'حجم الصفحة',
+        to: 'إلى',
+        of: 'من',
+        page: 'صفحة',
+        noRowsToShow: 'جاري تحميل البيانات ...',
+      }
     };
   },
   computed: {
@@ -220,15 +228,15 @@ export default {
     }
   },
   methods: {
-    onModelUpdated(event) {
-      const rowsCount = event.api.getDisplayedRowCount();
-      const topp = 20 + 80 + rowsCount * 80;
-      document.querySelector(".ag-center-cols-viewport").style.height = `${topp}px`;
+    onModelUpdated() {
+      //const rowsCount = event.api.getDisplayedRowCount();
+      //const topp = 20 + 80 + rowsCount * 80;
+      //document.querySelector(".ag-center-cols-viewport").style.height = `${topp}px`;
     },
-    getRowStyle(params) {
-      const index = params.node.rowIndex;
-      const top = 20 + index * 20;
-      return { top: `${top}px` };
+    getRowStyle() {
+      //const index = params.node.rowIndex;
+      //const top = 20 + index * 20;
+      //return { top: `${top}px` };
     },
     renderImageCell(params) {
       const img = document.createElement('img');
